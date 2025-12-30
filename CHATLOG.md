@@ -47,6 +47,8 @@ Next time you say **“开工”**, I will read this file first and continue fro
 - Tweaked `dashboard.html` layout (batch card checkbox alignment + 2 columns + equal-height cards).
 - Added `devtools/release.py` and `RELEASING.md` for one-command version bump + upload ZIP build.
 - 收工：准备打包发布（版本号递增 + 生成 Chrome Web Store 上传 ZIP）。
+- 增加 Chrome Web Store 标题/摘要的三语 `_locales` i18n（zh_CN / en / ja）。
+- 增加隐私权政策文档 `PRIVACY.md`（用于上架填写隐私政策链接）。
 
 ## How We Work Next Time
 - You say: **“开工”**
