@@ -1,0 +1,15 @@
+{
+  "extName": {
+    "message": "GSC 16か月バックアップ（非公式）",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Google Search Console のデータをローカルにアーカイブし、約16か月を超えて履歴を保持します。",
+    "description": "Extension description"
+  },
+  "extActionTitle": {
+    "message": "GSC バックアップ",
+    "description": "Toolbar title"
+  }
+}
+

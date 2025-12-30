@@ -1,0 +1,15 @@
+{
+  "extName": {
+    "message": "GSC 16个月备份（非官方）",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "将 Google Search Console 按月汇总等数据归档到本地，保留超过约 16 个月的历史。",
+    "description": "Extension description"
+  },
+  "extActionTitle": {
+    "message": "GSC 备份",
+    "description": "Toolbar title"
+  }
+}
+

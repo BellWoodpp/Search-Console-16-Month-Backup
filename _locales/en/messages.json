@@ -1,0 +1,15 @@
+{
+  "extName": {
+    "message": "Search Console 16-Month Backup (Unofficial)",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Archive Google Search Console data locally so you can keep history beyond ~16 months.",
+    "description": "Extension description"
+  },
+  "extActionTitle": {
+    "message": "GSC Backup",
+    "description": "Toolbar title"
+  }
+}
+

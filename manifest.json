@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "version": "0.1.1",
+  "default_locale": "zh_CN",
+  "name": "__MSG_extName__",
+  "description": "__MSG_extDescription__",
+  "action": {
+    "default_title": "__MSG_extActionTitle__",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "service_worker.js",
+    "type": "module"
+  },
+  "permissions": [
+    "identity",
+    "storage",
+    "alarms"
+  ],
+  "optional_permissions": [
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://searchconsole.googleapis.com/*",
+    "https://www.googleapis.com/*"
+  ],
+  "oauth2": {
+    "client_id": "315921148769-pldqv2s34bfjt5amogopln5c4nh3lhd1.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/webmasters.readonly"
+    ]
+  }
+}

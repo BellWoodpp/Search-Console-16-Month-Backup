@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n-doc-title="dashboardTitle">Search Console 16‑Month Backup</title>
+    <style>
+      :root {
+        --border: #e6e6e6;
+        --muted: #666;
+      }
+      body {
+        font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        margin: 20px;
+        max-width: 1200px;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 12px;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      label {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      input,
+      select {
+        padding: 6px 8px;
+        min-width: 260px;
+      }
+      input[type="month"] {
+        min-width: 140px;
+      }
+      button {
+        padding: 7px 10px;
+        cursor: pointer;
+      }
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        margin: 12px 0;
+      }
+      .grid2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        align-items: stretch;
+      }
+      .grid2 > .card {
+        margin: 0;
+        height: 100%;
+      }
+      .rangeGrid {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .checks2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 24px;
+        align-items: start;
+      }
+      .checks2 label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        gap: 10px;
+      }
+      .checks2 label > span {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .checks2 label > input[type="checkbox"] {
+        flex: 0 0 auto;
+      }
+      @media (max-width: 980px) {
+        .grid2 {
+          grid-template-columns: 1fr;
+        }
+        .rangeGrid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .muted {
+        color: var(--muted);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        padding: 8px 6px;
+        vertical-align: top;
+      }
+      .status {
+        white-space: pre-wrap;
+        color: #111;
+      }
+      .danger {
+        color: #b00020;
+      }
+      .pill {
+        display: inline-block;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <h1 data-i18n="dashboardTitle">Search Console 16‑Month Backup</h1>
+    <div class="muted" data-i18n="dashboardDesc">
+      归档 GSC 按月汇总数据到本地（超过 ~16 个月仍可查看）。
+    </div>
+
+    <div class="row" style="margin-top: 10px">
+      <label>
+        <span data-i18n="languageLabel">语言</span>
+        <select id="lang" data-lang-select style="min-width: 140px">
+          <option value="zh-CN" data-i18n="languageZh">中文</option>
+          <option value="ja" data-i18n="languageJa">日本語</option>
+          <option value="en" data-i18n="languageEn">English</option>
+        </select>
+      </label>
+      <button id="openOptions" data-i18n="openOptionsButton">自动归档设置</button>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <div class="row">
+          <button id="auth" data-i18n="authButton">授权 Google（OAuth）</button>
+          <button id="listSites" data-i18n="listSitesButton">拉取站点列表</button>
+          <span class="pill" id="authState" data-i18n="authStateUnauthed"
+            >未授权</span
+          >
+        </div>
+        <div class="row">
+          <label>
+            <span data-i18n="propertyLabel">站点（Property）</span>
+            <select id="siteSelect">
+              <option value="" data-i18n="propertyPlaceholder">
+                （先点“拉取站点列表”，或在设置里填默认站点）
+              </option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <span data-i18n="monthLabel">月份</span>
+            <input id="month" type="month" />
+          </label>
+          <button id="sync" data-i18n="syncButton">同步并归档该月汇总</button>
+        </div>
+        <div class="status" id="status"></div>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <strong data-i18n="rangeTitle">批量归档（月份范围）</strong>
+        </div>
+        <div class="rangeGrid">
+          <div>
+            <div class="row">
+              <label>
+                <span data-i18n="rangeStartLabel">开始月份</span>
+                <input id="rangeStart" type="month" />
+              </label>
+              <label>
+                <span data-i18n="rangeEndLabel">结束月份</span>
+                <input id="rangeEnd" type="month" />
+              </label>
+              <button id="runRange" data-i18n="rangeRunButton">
+                开始批量归档
+              </button>
+            </div>
+            <div class="row">
+              <label>
+                <span data-i18n="maxRowsQueryLabel">query 最大行数</span>
+                <input
+                  id="rangeMaxRowsQuery"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  step="100"
+                  style="min-width: 140px"
+                />
+              </label>
+              <label>
+                <span data-i18n="maxRowsPageLabel">page 最大行数</span>
+                <input
+                  id="rangeMaxRowsPage"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  step="100"
+                  style="min-width: 140px"
+                />
+              </label>
+            </div>
+            <div class="row">
+              <label>
+                <span data-i18n="maxRowsCountryLabel">country 最大行数</span>
+                <input
+                  id="rangeMaxRowsCountry"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  step="100"
+                  style="min-width: 140px"
+                />
+              </label>
+              <label>
+                <span data-i18n="maxRowsSearchAppearanceLabel"
+                  >searchAppearance 最大行数</span
+                >
+                <input
+                  id="rangeMaxRowsSearchAppearance"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  step="100"
+                  style="min-width: 140px"
+                />
+              </label>
+            </div>
+            <div class="muted" data-i18n="rangeNote">
+              提示：批量归档会按月逐个请求，耗时取决于选择的维度与行数。
+            </div>
+          </div>
+
+          <div class="checks2">
+            <label>
+              <span data-i18n="incTotals">按月汇总（totals）</span>
+              <input id="rangeIncTotals" type="checkbox" />
+            </label>
+            <label>
+              <span data-i18n="incQuery">查询词（query，Top N）</span>
+              <input id="rangeIncQuery" type="checkbox" />
+            </label>
+            <label>
+              <span data-i18n="incPage">页面（page，Top N）</span>
+              <input id="rangeIncPage" type="checkbox" />
+            </label>
+            <label>
+              <span data-i18n="incDevice">设备（device）</span>
+              <input id="rangeIncDevice" type="checkbox" />
+            </label>
+            <label>
+              <span data-i18n="incCountry">国家/地区（country，Top N）</span>
+              <input id="rangeIncCountry" type="checkbox" />
+            </label>
+            <label>
+              <span data-i18n="incSearchAppearance"
+                >展现类型（searchAppearance，Top N）</span
+              >
+              <input id="rangeIncSearchAppearance" type="checkbox" />
+            </label>
+            <label>
+              <span data-i18n="incDate">按天（date）</span>
+              <input id="rangeIncDate" type="checkbox" />
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <button id="refresh" data-i18n="refreshButton">刷新本地归档列表</button>
+        <button id="exportAll" data-i18n="exportJson">导出全部（JSON）</button>
+        <button id="exportExcel" data-i18n="exportExcel">导出全部（Excel）</button>
+        <button id="exportLibreOffice" data-i18n="exportLibreOffice">
+          导出全部（LibreOffice）
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thSite">站点</th>
+            <th data-i18n="thMonth">月份</th>
+            <th data-i18n="thClicks">点击</th>
+            <th data-i18n="thImpressions">展现</th>
+            <th data-i18n="thCtr">CTR</th>
+            <th data-i18n="thPosition">平均排名</th>
+            <th data-i18n="thArchivedAt">归档时间</th>
+          </tr>
+        </thead>
+        <tbody id="archives"></tbody>
+      </table>
+      <div class="muted" style="margin-top: 10px" data-i18n="noteMvp">
+        说明：这是 MVP，只归档“按月汇总”一条记录，后续可扩展到 query/page/device 等维度。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="querySectionTitle">查询词（query）明细归档</strong>
+        <span class="pill" id="queryMeta"></span>
+      </div>
+      <div class="row">
+        <label>
+          <span data-i18n="queryMaxRowsLabel">最多行数</span>
+          <input id="queryMaxRows" type="number" min="1" max="10000" step="100" />
+        </label>
+        <button id="syncQueries" data-i18n="querySyncButton">
+          同步并归档该月 query 明细
+        </button>
+      </div>
+      <div class="row">
+        <button id="exportQueryJson" data-i18n="exportQueryJson">
+          导出该月查询词（JSON）
+        </button>
+        <button id="exportQueryExcel" data-i18n="exportQueryExcel">
+          导出该月查询词（Excel）
+        </button>
+        <button id="exportQueryLibreOffice" data-i18n="exportQueryLibreOffice">
+          导出该月查询词（LibreOffice）
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thQuery">查询词</th>
+            <th data-i18n="thClicks">点击</th>
+            <th data-i18n="thImpressions">展现</th>
+            <th data-i18n="thCtr">CTR</th>
+            <th data-i18n="thPosition">平均排名</th>
+          </tr>
+        </thead>
+        <tbody id="queryRows"></tbody>
+      </table>
+      <div class="muted" style="margin-top: 10px" data-i18n="noteQueryLimit">
+        说明：query 明细可能很大，默认只归档 Top N（最多 10,000 行）。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="pageSectionTitle">页面（page）明细归档</strong>
+        <span class="pill" id="pageMeta"></span>
+      </div>
+      <div class="row">
+        <label>
+          <span data-i18n="pageMaxRowsLabel">最多行数</span>
+          <input id="pageMaxRows" type="number" min="1" max="10000" step="100" />
+        </label>
+        <button id="syncPages" data-i18n="pageSyncButton">
+          同步并归档该月 page 明细
+        </button>
+      </div>
+      <div class="row">
+        <button id="exportPageJson" data-i18n="exportPageJson">
+          导出该月页面（JSON）
+        </button>
+        <button id="exportPageExcel" data-i18n="exportPageExcel">
+          导出该月页面（Excel）
+        </button>
+        <button id="exportPageLibreOffice" data-i18n="exportPageLibreOffice">
+          导出该月页面（LibreOffice）
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thPage">页面</th>
+            <th data-i18n="thClicks">点击</th>
+            <th data-i18n="thImpressions">展现</th>
+            <th data-i18n="thCtr">CTR</th>
+            <th data-i18n="thPosition">平均排名</th>
+          </tr>
+        </thead>
+        <tbody id="pageRows"></tbody>
+      </table>
+      <div class="muted" style="margin-top: 10px" data-i18n="notePageLimit">
+        说明：page 明细可能很大，默认只归档 Top N（最多 10,000 行）。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="deviceSectionTitle">设备（device）明细归档</strong>
+        <span class="pill" id="deviceMeta"></span>
+      </div>
+      <div class="row">
+        <button id="syncDevices" data-i18n="deviceSyncButton">
+          同步并归档该月 device 明细
+        </button>
+      </div>
+      <div class="row">
+        <button id="exportDeviceJson" data-i18n="exportDeviceJson">
+          导出该月设备（JSON）
+        </button>
+        <button id="exportDeviceExcel" data-i18n="exportDeviceExcel">
+          导出该月设备（Excel）
+        </button>
+        <button id="exportDeviceLibreOffice" data-i18n="exportDeviceLibreOffice">
+          导出该月设备（LibreOffice）
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thDevice">设备</th>
+            <th data-i18n="thClicks">点击</th>
+            <th data-i18n="thImpressions">展现</th>
+            <th data-i18n="thCtr">CTR</th>
+            <th data-i18n="thPosition">平均排名</th>
+          </tr>
+        </thead>
+        <tbody id="deviceRows"></tbody>
+      </table>
+      <div class="muted" style="margin-top: 10px" data-i18n="noteDevice">
+        说明：device 维度通常只有 DESKTOP/MOBILE/TABLET 三行。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="countrySectionTitle">国家/地区（country）明细归档</strong>
+        <span class="pill" id="countryMeta"></span>
+      </div>
+      <div class="row">
+        <label>
+          <span data-i18n="countryMaxRowsLabel">最多行数</span>
+          <input id="countryMaxRows" type="number" min="1" max="10000" step="100" />
+        </label>
+        <button id="syncCountries" data-i18n="countrySyncButton">
+          同步并归档该月 country 明细
+        </button>
+      </div>
+      <div class="row">
+        <button id="exportCountryJson" data-i18n="exportCountryJson">
+          导出该月国家/地区（JSON）
+        </button>
+        <button id="exportCountryExcel" data-i18n="exportCountryExcel">
+          导出该月国家/地区（Excel）
+        </button>
+        <button
+          id="exportCountryLibreOffice"
+          data-i18n="exportCountryLibreOffice"
+        >
+          导出该月国家/地区（LibreOffice）
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thCountry">国家/地区</th>
+            <th data-i18n="thClicks">点击</th>
+            <th data-i18n="thImpressions">展现</th>
+            <th data-i18n="thCtr">CTR</th>
+            <th data-i18n="thPosition">平均排名</th>
+          </tr>
+        </thead>
+        <tbody id="countryRows"></tbody>
+      </table>
+      <div class="muted" style="margin-top: 10px" data-i18n="noteCountryLimit">
+        说明：country 明细可能较多，默认只归档 Top N（最多 10,000 行）。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="searchAppearanceSectionTitle"
+          >展现类型（searchAppearance）明细归档</strong
+        >
+        <span class="pill" id="searchAppearanceMeta"></span>
+      </div>
+      <div class="row">
+        <label>
+          <span data-i18n="searchAppearanceMaxRowsLabel">最多行数</span>
+          <input
+            id="searchAppearanceMaxRows"
+            type="number"
+            min="1"
+            max="10000"
+            step="100"
+          />
+        </label>
+        <button
+          id="syncSearchAppearances"
+          data-i18n="searchAppearanceSyncButton"
+        >
+          同步并归档该月 searchAppearance 明细
+        </button>
+      </div>
+      <div class="row">
+        <button id="exportSearchAppearanceJson" data-i18n="exportSearchAppearanceJson">
+          导出该月展现类型（JSON）
+        </button>
+        <button
+          id="exportSearchAppearanceExcel"
+          data-i18n="exportSearchAppearanceExcel"
+        >
+          导出该月展现类型（Excel）
+        </button>
+        <button
+          id="exportSearchAppearanceLibreOffice"
+          data-i18n="exportSearchAppearanceLibreOffice"
+        >
+          导出该月展现类型（LibreOffice）
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thSearchAppearance">展现类型</th>
+            <th data-i18n="thClicks">点击</th>
+            <th data-i18n="thImpressions">展现</th>
+            <th data-i18n="thCtr">CTR</th>
+            <th data-i18n="thPosition">平均排名</th>
+          </tr>
+        </thead>
+        <tbody id="searchAppearanceRows"></tbody>
+      </table>
+      <div
+        class="muted"
+        style="margin-top: 10px"
+        data-i18n="noteSearchAppearanceLimit"
+      >
+        说明：searchAppearance 取值取决于站点（如富结果等），默认只归档 Top N（最多 10,000 行）。
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <strong data-i18n="dateSectionTitle">日期（date）按天归档</strong>
+        <span class="pill" id="dateMeta"></span>
+      </div>
+      <div class="row">
+        <button id="syncDates" data-i18n="dateSyncButton">
+          同步并归档该月按天数据
+        </button>
+      </div>
+      <div class="row">
+        <button id="exportDateJson" data-i18n="exportDateJson">
+          导出该月按天（JSON）
+        </button>
+        <button id="exportDateExcel" data-i18n="exportDateExcel">
+          导出该月按天（Excel）
+        </button>
+        <button id="exportDateLibreOffice" data-i18n="exportDateLibreOffice">
+          导出该月按天（LibreOffice）
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="thDate">日期</th>
+            <th data-i18n="thClicks">点击</th>
+            <th data-i18n="thImpressions">展现</th>
+            <th data-i18n="thCtr">CTR</th>
+            <th data-i18n="thPosition">平均排名</th>
+          </tr>
+        </thead>
+        <tbody id="dateRows"></tbody>
+      </table>
+      <div class="muted" style="margin-top: 10px" data-i18n="noteDate">
+        说明：date 维度会返回该月每天一行（通常 28~31 行）。
+      </div>
+    </div>
+
+    <script src="i18n.js"></script>
+    <script src="country_codes.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
